@@ -360,6 +360,19 @@
       }
     },
     {
+      "name": "[parameters('publicUntrustIPAddressName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2017-10-01",
+      "condition": "[equals(parameters('publicIPNewOrExisting'), 'new')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "[parameters('publicIPAllocationMethod')]",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('publicUntrustIPAddressName')]"
+        }
+      }
+    },
+    {
       "name": "[parameters('nsgName')]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2017-10-01",
