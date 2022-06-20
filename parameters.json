@@ -88,6 +88,15 @@
         },
         "customData": {
             "value": "storage-account=None,access-key=None,file-share=None,share-directory=None"
+        },
+        "routeTablename": {
+            "value": "routetable-name"
+        },
+        "tagsByResource": {
+            "value": {}
+        },
+        "disableBgpRoutePropagation": {
+            "value": false
         }
     }
 }

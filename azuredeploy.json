@@ -269,7 +269,22 @@
     "availabilitySetPlatformUpdateDomainCount": {
       "type": "string",
       "defaultValue": "5"
+    },
+    "routeTablename": {
+      "type": "string",
+      "defaultValue": "routetable-name"
+    },
+    "tagsByResource": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+          "description": "Optional tags provided by the user via createUiDefinition.json"
+      }
+    },
+    "disableBgpRoutePropagation": {
+      "type": "bool"
     }
+
   },
   "variables": {
     "imagePublisher": "paloaltonetworks",
@@ -607,6 +622,25 @@
         "availabilitySet": "[if(equals(parameters('availabilitySetName'), 'None'), json('null'), variables('availabilitySet'))]"
       },
       "zones": "[if(equals(parameters('zone'), 'None'), json('null'), variables('zones'))]"
+    },
+    {
+      "apiVersion": "2019-02-01",
+      "type": "Microsoft.Network/routeTables",
+      "name": "[parameters('routeTablename')]",
+      "location": "[parameters('location')]",
+      "properties": {
+          "disableBgpRoutePropagation": "[parameters('disableBgpRoutePropagation')]",
+          "routes": [
+            {
+              "name": "Default",
+              "properties": {
+                "addressPrefix": "0.0.0.0/0",
+                "nextHopIpAddress": "[variables('FWPrivateIPAddressTrust')]",
+                "nextHopType": "VirtualAppliance"
+              }
+            }
+          ]
+      }
     }
   ]
 }
