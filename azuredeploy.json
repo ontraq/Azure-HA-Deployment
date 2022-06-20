@@ -147,6 +147,27 @@
         "description": "Trust subnet CIDR"
       }
     },
+    "subnet0StartAddress": {
+        "type": "string",
+        "defaultValue": "192.168.0.4",
+        "metadata": {
+            "description": "Mgmt subnet start address"
+        }
+    },
+    "subnet1StartAddress": {
+        "type": "string",
+        "defaultValue": "192.168.1.4",
+        "metadata": {
+            "description": "Untrust subnet start address"
+        }
+    },
+    "subnet2StartAddress": {
+        "type": "string",
+        "defaultValue": "192.168.2.4",
+        "metadata": {
+            "description": "Trust subnet start address"
+        }
+    },
     "authenticationType": {
       "type": "string",
       "metadata": {
@@ -199,8 +220,14 @@
     "publicIPAddressName": {
       "type": "string",
       "metadata": {
-        "description": "Name of existing public IP resource"
+        "description": "Name of existing mgmt public IP resource"
       }
+    },
+    "publicUntrustIPAddressName": {
+        "type": "string",
+        "metadata": {
+            "description": "Name of existing Untrust public IP resource"
+        }
     },
     "publicIPAllocationMethod": {
       "type": "string",
@@ -249,6 +276,9 @@
     "imageSku": "byol",
     "imageOffer": "vmseries-flex",
     "nicName": "[concat(parameters('vmName'), '-', parameters('publicIPAddressName'), '-eth')]",
+    "FWPrivateIPAddressMgmt": "[parameters('subnet0StartAddress')]",
+    "FWPrivateIPAddressUntrust": "[parameters('subnet1StartAddress')]",
+    "FWPrivateIPAddressTrust": "[parameters('subnet2StartAddress')]",
     "existingVnetID": "[resourceId(parameters('virtualNetworkExistingRGName'),concat('Microsoft.Network','/','virtualNetworks'),parameters('virtualNetworkName'))]",
     "existingSubnet0Ref": "[concat(variables('existingVnetID'),'/subnets/',parameters('subnet0Name'))]",
     "existingSubnet1Ref": "[concat(variables('existingVnetID'),'/subnets/',parameters('subnet1Name'))]",
@@ -413,7 +443,8 @@
           {
             "name": "ipconfig-mgmt",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
+              "privateIPAllocationMethod": "Static",
+              "privateIpAddress": "[variables('FWPrivateIPAddressMgmt')]",
               "publicIPAddress": {
                 "id": "[resourceId(concat('Microsoft.Network','/','publicIPAddresses'),parameters('publicIPAddressName'))]"
               },
@@ -430,7 +461,7 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2017-10-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddressName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicUntrustIPAddressName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
       ],
       "location": "[parameters('location')]",
@@ -441,7 +472,11 @@
           {
             "name": "ipconfig-untrust",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
+              "privateIPAllocationMethod": "Static",
+              "privateIpAddress": "[variables('FWPrivateIPAddressUntrust')]",
+              "publicIPAddress": {
+                "id": "[resourceId(concat('Microsoft.Network','/','publicIPAddresses'),parameters('publicUntrustIPAddressName'))]"
+              },
               "subnet": {
                 "id": "[variables('subnet1Ref')]"
               }
@@ -455,7 +490,6 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2017-10-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddressName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
       ],
       "location": "[parameters('location')]",
@@ -466,7 +500,8 @@
           {
             "name": "ipconfig-trust",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
+              "privateIPAllocationMethod": "Static",
+              "privateIpAddress": "[variables('FWPrivateIPAddressTrust')]",
               "subnet": {
                 "id": "[variables('subnet2Ref')]"
               }
@@ -498,6 +533,7 @@
       "apiVersion": "2018-06-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddressName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicUntrustIPAddressName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]",
         "[concat(variables('nicName'), '0')]",

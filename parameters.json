@@ -6,7 +6,10 @@
             "value": "westus"
         },
         "publicIPAddressName": {
-            "value": "PUBLICIP-NAME"
+            "value": "MgmtPublicIP-Name"
+        },
+        "publicUntrustIPAddressName": {
+            "value": "UntrustPublicIP-Name"
         },
         "publicIPNewOrExisting": {
             "value": "new"
@@ -70,6 +73,15 @@
         },
         "subnet2Prefix": {
             "value": "192.168.2.0/24"
+        },
+        "subnet0StartAddress": {
+            "value": "192.168.0.4"
+        },
+        "subnet1StartAddress": {
+            "value": "192.168.1.4"
+        },
+        "subnet2StartAddress": {
+            "value": "192.168.2.4"
         },
         "bootstrap": {
             "value": "no"
